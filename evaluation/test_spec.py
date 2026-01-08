@@ -4,7 +4,7 @@ import platform
 import re
 
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any, Optional, Union
 from typing import TypedDict
 # from constants import (
 #     SWEbenchInstance,
@@ -49,7 +49,7 @@ class TestSpec:
     repo: str
     version: str
     # repo_script_list: str
-    dockerfile: str
+    dockerfile: Optional[str]
     eval_script: str
     
     # env_script_list: str
@@ -57,6 +57,7 @@ class TestSpec:
     FAIL_TO_PASS: list[str]
     PASS_TO_PASS: list[str]
     patch: str
+    image_name: Optional[str] = None
 
     # @property
     # def setup_env_script(self):
@@ -91,6 +92,8 @@ class TestSpec:
 
     @property
     def instance_image_key(self):
+        if self.image_name:
+            return self.image_name
         return f"setup.{self.instance_id.lower()}:latest"
 
     def get_instance_container_name(self, run_id=None):
@@ -493,7 +496,15 @@ def make_test_spec(instance: SWEbenchInstance,predictions: dict,language = 'pyth
     test_patch = instance["test_patch"]
     patch = predictions['model_patch']
     eval_script = instance['eval_script']
-    dockerfile = instance['dockerfile']
+    image_name = instance.get("image_name") or instance.get("docker_image")
+    if isinstance(image_name, str):
+        image_name = image_name.strip() or None
+    elif image_name is not None:
+        raise ValueError(f"image_name/docker_image must be a string for {instance_id}")
+
+    dockerfile = instance.get("dockerfile")
+    if not dockerfile and not image_name:
+        raise ValueError(f"Missing dockerfile for {instance_id} without image_name/docker_image")
 
 
 
@@ -522,5 +533,6 @@ def make_test_spec(instance: SWEbenchInstance,predictions: dict,language = 'pyth
         # arch=arch,
         FAIL_TO_PASS=fail_to_pass,
         PASS_TO_PASS=pass_to_pass,
-        patch = patch
+        patch = patch,
+        image_name = image_name,
     )

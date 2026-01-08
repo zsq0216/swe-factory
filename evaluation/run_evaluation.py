@@ -458,6 +458,7 @@ def run_instances(
         instances: list,
         cache_level: str,
         clean: bool,
+        rm_image: bool,
         force_rebuild: bool,
         max_workers: int,
         run_id: str,
@@ -474,6 +475,7 @@ def run_instances(
         instances (list): List of instances
         cache_level (str): Cache level
         clean (bool): Clean images above cache level
+        rm_image (bool): Whether to remove instance images after running
         force_rebuild (bool): Force rebuild images
         max_workers (int): Maximum number of workers
         run_id (str): Run ID
@@ -512,7 +514,7 @@ def run_instances(
                         #     clean,
                         #     existing_images,
                         # ),
-                        True,
+                        rm_image,
                         force_rebuild,
                         client,
                         run_id,
@@ -545,7 +547,7 @@ def run_instances(
                         #     clean,
                         #     existing_images,
                         # ),
-                        True,
+                        rm_image,
                         force_rebuild,
                         client,
                         run_id,
@@ -852,6 +854,7 @@ def main(
         is_judge_fail2pass: bool,
         cache_level: str,
         clean: bool,
+        rm_image: bool,
         open_file_limit: int,
         run_id: str,
         output_path:str,
@@ -914,10 +917,25 @@ def main(
     else:
         # build environment images + run instances
         # build_env_images(client, dataset, force_rebuild, max_workers)
-        run_instances(predictions, dataset, cache_level, clean, force_rebuild, max_workers, run_id, output_path, timeout, is_judge_fail2pass)
+        run_instances(
+            predictions,
+            dataset,
+            cache_level,
+            clean,
+            rm_image,
+            force_rebuild,
+            max_workers,
+            run_id,
+            output_path,
+            timeout,
+            is_judge_fail2pass,
+        )
 
     # clean images + make final report
-    clean_images(client, existing_images, cache_level, clean)
+    if rm_image:
+        clean_images(client, existing_images, cache_level, clean)
+    else:
+        print("Skipping image cleanup because rm_image is False.")
     make_run_report(predictions, full_dataset, client, run_id, reports_dir,output_path)
 
 
@@ -954,6 +972,12 @@ if __name__ == "__main__":
     # if clean is false, we only remove images above the cache level if they don't already exist
     parser.add_argument(
         "--clean", type=str2bool, default=False, help="Clean images above cache level"
+    )
+    parser.add_argument(
+        "--rm_image",
+        type=str2bool,
+        default=True,
+        help="Remove instance images after running",
     )
     parser.add_argument("--run_id", type=str, required=True, help="Run ID - identifies the run")
     parser.add_argument("--output_path", type=str, required=True, help="Run ID - identifies the run")

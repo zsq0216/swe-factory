@@ -517,6 +517,22 @@ def build_instance_image_one_stage(
     # env_image_name = test_spec.env_image_key
     dockerfile = test_spec.dockerfile
 
+    if test_spec.image_name:
+        try:
+            client.images.get(image_name)
+            logger.info(f"Using existing image {image_name}; skipping build.")
+            if new_logger:
+                close_logger(logger)
+            return
+        except docker.errors.ImageNotFound as e:
+            if new_logger:
+                close_logger(logger)
+            raise BuildImageError(
+                test_spec.instance_id,
+                f"Image {image_name} not found for {test_spec.instance_id}",
+                logger,
+            ) from e
+
     # Check that the env. image the instance image is based on exists
     # try:
     #     env_image = client.images.get(env_image_name)
@@ -639,7 +655,12 @@ def build_setup_container(
     """
     # Build corresponding instance image
     if force_rebuild:
-        remove_image(client, test_spec.instance_image_key, "quiet")
+        if test_spec.image_name:
+            logger.info(
+                f"force_rebuild ignored for existing image {test_spec.instance_image_key}"
+            )
+        else:
+            remove_image(client, test_spec.instance_image_key, "quiet")
     build_instance_image_one_stage(test_spec, client, logger, nocache, output_path)
 
     container = None
