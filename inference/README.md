@@ -34,7 +34,7 @@ the LLM before running:
 
 ```bash
 export OPENAI_API_KEY="YOUR_API_KEY"
-export OPENAI_BASE_URL="https://api.openai.com/v1"  # optional override
+export OPENAI_BASE_URL="YOUR_URL"  # optional override
 ```
 
 Set the model name via `--model_name <model_name>` (or `OPENAI_MODEL` if already set).
@@ -87,7 +87,7 @@ Model calls go through LiteLLM. Set your base URL and provider API key before
 running (examples below).
 
 ```bash
-export LLM_BASE_URL="http://127.0.0.1:8000/v1"
+export LLM_BASE_URL="YOUR_URL"
 export OPENAI_API_KEY="YOUR_API_KEY"
 export OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"
 ```
