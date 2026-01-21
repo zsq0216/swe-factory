@@ -89,11 +89,17 @@ Outputs in `--output`:
 ### Supported Agents
 
 Run against the transferred dataset produced in Stage 1. We currently support
-mini_swe_agent, the DeepSWE editing agent (r2egym scaffold), and OpenHands (last).
-OpenHands is unofficial here and diverges significantly from the original
-implementation, so please use it with caution. We aim for a closer reproduction
-over time and welcome PRs. At the moment, only non-function calling mode is
-supported.
+mini_swe_agent, the DeepSWE editing agent (r2egym scaffold), live_swe_agent, and
+OpenHands (experimental, unofficial). OpenHands diverges significantly from the
+original implementation, so please use it with caution. We aim for a closer
+reproduction over time and welcome PRs. At the moment, only non-function calling
+mode is supported.
+
+Notes:
+- mini_swe_agent and live_swe_agent only expose a bash tool, so they are
+  language-agnostic and suitable for non-Python repos.
+- r2egym (DeepSWE) and OpenHands use Python-based tools; we recommend them for
+  Python repositories.
 
 ### Dataset Requirements
 
@@ -118,22 +124,6 @@ export OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"
 **Run these commands from the repo root.** If you run from another directory,
 set `PYTHONPATH` to the repo path first.
 
-DeepSWE editing agent (r2egym scaffold):
-```bash
-python -m inference.agenthub.run.edit runagent_multiple \
-  --dataset /path/to/TRANSFERRED_DATASET.json \
-  --split dev \
-  --k 1 \
-  --start_idx 0 \
-  --max_workers 5 \
-  --traj_dir ./run_logs/deepswe_run \
-  --exp_name deepswe_run \
-  --llm_name openai/gpt-4o-mini \
-  --use_fn_calling False \
-  --backend docker \
-  --scaffold r2egym
-```
-
 mini_swe_agent:
 ```bash
 python -m inference.agenthub.run.edit runagent_multiple \
@@ -150,7 +140,39 @@ python -m inference.agenthub.run.edit runagent_multiple \
   --scaffold mini_swe_agent
 ```
 
-OpenHands (experimental):
+DeepSWE editing agent (r2egym scaffold):
+```bash
+python -m inference.agenthub.run.edit runagent_multiple \
+  --dataset /path/to/TRANSFERRED_DATASET.json \
+  --split dev \
+  --k 1 \
+  --start_idx 0 \
+  --max_workers 5 \
+  --traj_dir ./run_logs/deepswe_run \
+  --exp_name deepswe_run \
+  --llm_name openai/gpt-4o-mini \
+  --use_fn_calling False \
+  --backend docker \
+  --scaffold r2egym
+```
+
+live_swe_agent:
+```bash
+python -m inference.agenthub.run.edit runagent_multiple \
+  --dataset /path/to/TRANSFERRED_DATASET.json \
+  --split dev \
+  --k 1 \
+  --start_idx 0 \
+  --max_workers 5 \
+  --traj_dir ./run_logs/live_swe_run \
+  --exp_name live_swe_run \
+  --llm_name openai/gpt-4o-mini \
+  --use_fn_calling False \
+  --backend docker \
+  --scaffold live_swe_agent
+```
+
+OpenHands (experimental, unofficial):
 ```bash
 python -m inference.agenthub.run.edit runagent_multiple \
   --dataset /path/to/TRANSFERRED_DATASET.json \
@@ -188,7 +210,7 @@ Notes:
 | `--llm_name` | LiteLLM model name | `openai/gpt-4o-mini` |
 | `--use_fn_calling` | Function-calling mode | `False` (only supported) |
 | `--backend` | Runtime backend | `docker` |
-| `--scaffold` | Agent scaffold | `r2egym` / `mini_swe_agent` / `openhands` |
+| `--scaffold` | Agent scaffold | `mini_swe_agent` / `r2egym` / `live_swe_agent` / `openhands` |
 
 ## Acknowledgements
 
