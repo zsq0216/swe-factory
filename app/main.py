@@ -257,13 +257,13 @@ def add_task_related_args(parser: ArgumentParser) -> None:
         "--model",
         type=model_parser,
         default="gpt-3.5-turbo-0125",
-        help="The model to use. Currently only OpenAI models are supported.",
+        help="The model to use. OpenRouter-compatible models are supported.",
     )
     parser.add_argument(
         "--model-temperature",
         type=float,
         default=0.0,
-        help="The model temperature to use, for OpenAI models.",
+        help="The model temperature to use.",
     )
     parser.add_argument(
         "--conv-round-limit",
@@ -472,7 +472,7 @@ def make_swe_tasks(
         setup_info = {}
         task_info = tasks_map[task_id]
         task_start_time_s = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        repo_cache_name = f'{task_info['repo']}_cache'
+        repo_cache_name = f"{task_info['repo']}_cache"
         repo_cache_dir =  pjoin(setup_dir,repo_cache_name)
         if not os.path.isdir(repo_cache_dir):
             github_link = f"https://github.com/{task_info['repo']}.git"

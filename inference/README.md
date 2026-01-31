@@ -36,11 +36,11 @@ dataset produced by the SWE-Builder stage (the output of `app/main.py` under the
 ### LLM Configuration (Stage 1)
 
 > [!IMPORTANT]
-> Stage 1 uses direct OpenAI-compatible chat completions (not LiteLLM).
+> Stage 1 uses direct OpenRouter-compatible chat completions (not LiteLLM).
 
 ```bash
-export OPENAI_API_KEY="YOUR_API_KEY"
-export OPENAI_BASE_URL="YOUR_URL"  # optional override
+export OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"
+export OPENROUTER_API_BASE_URL="YOUR_URL"  # optional override
 ```
 
 Set the model name via `--model_name <model_name>` (required).
@@ -110,7 +110,6 @@ running (examples below).
 
 ```bash
 export LLM_BASE_URL="YOUR_URL"
-export OPENAI_API_KEY="YOUR_API_KEY"
 export OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"
 ```
 

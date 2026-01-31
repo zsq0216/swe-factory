@@ -165,15 +165,25 @@ class TransferAgent:
     # Model interaction
     # ------------------------------------------------------------------
     def _call_model(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
         if not api_key:
-            raise ParsingError("Missing OPENAI_API_KEY for LLM calls")
-        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+            raise ParsingError("Missing OPENROUTER_API_KEY for LLM calls")
+        base_url = (
+            os.getenv("OPENROUTER_API_BASE_URL")
+            or os.getenv("OPENAI_BASE_URL")
+            or "https://openrouter.ai/api/v1"
+        ).rstrip("/")
         endpoint = f"{base_url}/chat/completions"
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
+        referer = os.getenv("OPENROUTER_HTTP_REFERER", "").strip()
+        app_name = os.getenv("OPENROUTER_APP_NAME", "").strip()
+        if referer:
+            headers["HTTP-Referer"] = referer
+        if app_name:
+            headers["X-Title"] = app_name
         max_attempts = 3
         last_exc: Exception | None = None
 

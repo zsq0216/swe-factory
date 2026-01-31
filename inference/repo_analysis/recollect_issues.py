@@ -1,4 +1,5 @@
 import json
+import os
 import glob
 from multiprocessing import Pool
 
@@ -14,7 +15,26 @@ def get_files():
     return glob.glob("repo_datasets/*.jsonl")
 
 
-client = OpenAI()
+base_url = (
+    os.getenv("OPENROUTER_API_BASE_URL")
+    or os.getenv("OPENAI_API_BASE_URL")
+    or "https://openrouter.ai/api/v1"
+)
+api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_KEY")
+if not api_key:
+    raise RuntimeError("Missing OPENROUTER_API_KEY for OpenRouter calls")
+default_headers = {}
+referer = os.getenv("OPENROUTER_HTTP_REFERER", "").strip()
+app_name = os.getenv("OPENROUTER_APP_NAME", "").strip()
+if referer:
+    default_headers["HTTP-Referer"] = referer
+if app_name:
+    default_headers["X-Title"] = app_name
+client = OpenAI(
+    api_key=api_key,
+    base_url=base_url,
+    default_headers=default_headers or None,
+)
 tokenizer = tiktoken.encoding_for_model("o1-mini")
 
 

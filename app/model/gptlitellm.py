@@ -48,8 +48,8 @@ class OpenaiLiteLLMModel(Model):
         self.check_api_key()
 
     def check_api_key(self) -> str:
-        key_name = "OPENAI_KEY"
-        key = os.getenv(key_name)
+        key_name = "OPENROUTER_API_KEY"
+        key = os.getenv(key_name) or os.getenv("OPENAI_KEY")
         if not key:
             print(f"Please set the {key_name} env var")
             sys.exit(1)
@@ -92,7 +92,11 @@ class OpenaiLiteLLMModel(Model):
                 max_tokens=4096,
                 response_format={"type": response_format},
                 top_p=top_p,
-                base_url=os.getenv("OPENAI_API_BASE_URL", None),
+                base_url=(
+                    os.getenv("OPENROUTER_API_BASE_URL")
+                    or os.getenv("OPENAI_API_BASE_URL")
+                    or "https://openrouter.ai/api/v1"
+                ),
                 stream=False,
             )
             assert isinstance(response, ModelResponse)
@@ -188,4 +192,3 @@ class Gpt4_0613LiteLLM(OpenaiLiteLLMModel):
     def __init__(self):
         super().__init__("litellm-gpt-4-0613", 0.00003, 0.00006)
         self.note = "Not turbo. Up to Sep 2021."
-

@@ -49,8 +49,8 @@ We use GitHub APIs and predefined patterns to collect raw issue data (e.g., `pyt
 After collecting raw issue data, set up the evaluation environment by running:
 
 ```bash
-export OPENAI_API_BASE_URL=<your_base_url>
-export OPENAI_KEY=<your_key>
+export OPENROUTER_API_BASE_URL=<your_base_url>
+export OPENROUTER_API_KEY=<your_key>
 
 python app/main.py swe-bench \
     --model gpt-4.1-mini \
@@ -95,8 +95,8 @@ We evaluated SWE-Builder using three base models:
 To reproduce these experiments:
 
 ```bash
-export OPENAI_API_BASE_URL=<your_base_url>
-export OPENAI_KEY=<your_key>
+export OPENROUTER_API_BASE_URL=<your_base_url>
+export OPENROUTER_API_KEY=<your_key>
 bash run/run.sh
 ```
 

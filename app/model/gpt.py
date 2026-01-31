@@ -1,5 +1,5 @@
 """
-Interfacing with OpenAI models.
+Interfacing with OpenRouter (OpenAI-compatible) models.
 """
 
 import json
@@ -32,7 +32,7 @@ import time
 class OpenaiModel(Model):
     """
     Base class for creating Singleton instances of OpenAI models.
-    We use native API from OpenAI instead of LiteLLM.
+    We use native OpenAI SDK against OpenRouter-compatible endpoints.
     """
 
     _instances = {}
@@ -69,12 +69,29 @@ class OpenaiModel(Model):
         """
         if self.client is None:
             key = self.check_api_key()
-            self.client = OpenAI(api_key=key,base_url=os.getenv("OPENAI_API_BASE_URL", None),timeout=300)
+            base_url = (
+                os.getenv("OPENROUTER_API_BASE_URL")
+                or os.getenv("OPENAI_API_BASE_URL")
+                or "https://openrouter.ai/api/v1"
+            )
+            headers = {}
+            referer = os.getenv("OPENROUTER_HTTP_REFERER", "").strip()
+            app_name = os.getenv("OPENROUTER_APP_NAME", "").strip()
+            if referer:
+                headers["HTTP-Referer"] = referer
+            if app_name:
+                headers["X-Title"] = app_name
+            self.client = OpenAI(
+                api_key=key,
+                base_url=base_url,
+                timeout=300,
+                default_headers=headers or None,
+            )
 
     def check_api_key(self) -> str:
-        key = os.getenv("OPENAI_KEY")
+        key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_KEY")
         if not key:
-            print("Please set the OPENAI_KEY env var")
+            print("Please set the OPENROUTER_API_KEY env var")
             sys.exit(1)
         return key
 
